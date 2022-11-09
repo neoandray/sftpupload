@@ -47,8 +47,8 @@ public static void main(String[] args){
 		
         ftpdomain  	     = "localhost";
 		ftpport   	     = 2122;
-		ftpusername  	 = "sftpuser";
-		ftppassword      = "SftpUser123!";
+		ftpusername  	 = "";
+		ftppassword      = "";
 		localFolder      = "/mnt/c/Users/jgw51912/Documents/J/Jenkins/staging/output";
 		//localFolder    = "/mnt/c/Users/jgw51912/Perforce/backup"
 		remoteFolder     = "/opt/data";
@@ -56,27 +56,27 @@ public static void main(String[] args){
 		queueSize        = 100;
 
 		CliBuilder cliArgParser = new CliBuilder(usage:'SftpUploadHelper -h HOSTNAME -P PORT -u USERNAME -p PASSWORD -lf LOCAL_FOLDER -tf TARGET_FOLDER -t THREADS -qs THREAD_QUEUE_SIZE');
-		cliArgParser.h(longOpt:'host', argName:'host', required: true,'The resolvable hostname or IP address of the sftp server');
-		cliArgParser.P(longOpt:'port', argName:'port',required: true, 'The port that the sftp server listens on');
-		cliArgParser.u(longOpt:'username',  argName:'userName', 'The username used to authenticate into the sftp server');
-		cliArgParser.p(longOpt:'password', argName:'password', 'The password for the user specified');
-		cliArgParser.t(longOpt:'threads',  argName:'threads', 'The the number of concurrent copy threads');
-		cliArgParser.lf(longOpt:'localfolder',  argName:'localFolder',required: true, 'The local folder to be copied');
-		cliArgParser.tf(longOpt:'targetfolder',  argName:'targetFolder', required: true,'The target folder on the sftp server');
-		cliArgParser.qs(longOpt:'size',  argName:'queueSize', 'The size of the threadpool of concurrent threads');
+		cliArgParser.h(longOpt:'host',args: 1, type: String, argName:'host', 'The resolvable hostname or IP address of the sftp server');
+		cliArgParser.P(longOpt:'port',args: 1, type: int, argName:'port', 'The port that the sftp server listens on');
+		cliArgParser.u(longOpt:'username',args: 1, type: String,  argName:'userName', 'The username used to authenticate into the sftp server');
+		cliArgParser.p(longOpt:'password',args: 1, type: String, argName:'password', 'The password for the user specified');
+		cliArgParser.t(longOpt:'threads',args: 1, type: int,  argName:'threads', 'The the number of concurrent copy threads');
+		cliArgParser.lf(longOpt:'localfolder',args: 1, type: String,  argName:'localFolder','The local folder to be copied');
+		cliArgParser.tf(longOpt:'targetfolder',args: 1, type: String, argName:'targetFolder', 'The target folder on the sftp server');
+		cliArgParser.qs(longOpt:'size',args: 1, type: int, argName:'queueSize', 'The size of the threadpool of concurrent threads');
  
         def options = cliArgParser.parse(args);
 
 	   if (!options) {
 			println('usage - SftpUploadHelper -h HOSTNAME -P PORT -u USERNAME -p PASSWORD -lf LOCAL_FOLDER -tf TARGET_FOLDER -t THREADS -qs THREAD_QUEUE_SIZE \n OR');
-			println('usage- SftpUploadHelper -h HOSTNAME -P PORT -lf LOCAL_FOLDER -tf TARGET_FOLDER. If using the default SFTP server.');
+			println('usage - SftpUploadHelper -h HOSTNAME -P PORT -lf LOCAL_FOLDER -tf TARGET_FOLDER. If using the default SFTP server.');
 			return
        }
 		if (options.h) {
 		  ftpdomain =options.h;
 		}
 		if (options.P) {
-			ftpport=options.P;
+			ftpport= Integer.valueOf(options.P);
 		}
 		if (options.u) {
 			ftpusername=options.u;
@@ -85,16 +85,16 @@ public static void main(String[] args){
 			ftppassword=options.p;
 		}
 		if (options.t) {
-			threads=options.t;
+			threads=Integer.valueOf(options.t);
 		}
 		if (options.lf) {
-			localFolder=options.fl;
+			localFolder=options.lf;
 		}
 		if (options.tf) {
-			localFolder=options.tf;
+			remoteFolder=options.tf;
 		}
 		if (options.qs) {
-			queueSize=options.qs;
+			queueSize=Integer.valueOf(options.qs);
 		}
 		startUpload();	
 	}
