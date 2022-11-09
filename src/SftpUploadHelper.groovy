@@ -96,8 +96,7 @@ public static void main(String[] args){
 		if (options.qs) {
 			queueSize=options.qs;
 		}
-		startUpload();
-		
+		startUpload();	
 	}
 		
 }
@@ -146,7 +145,6 @@ public class SftpUploader implements Runnable {
 					catch ( SftpException e ) {
 
 						sftp.mkdir( remoteFolder.toString() );
-						// ((ChannelExec)sftp).setCommand("sudo mkdir -p "+ remoteFolder.toString());
 						sftp.cd(remoteFolder.toString() );
 					}
 
@@ -161,11 +159,11 @@ public class SftpUploader implements Runnable {
 			Channel channel = null;		
 			try {
 				String remoteFile = localfilelocation.replace(SftpUploadHelper.localFolder, remotefilelocation).replace('\\','/')
-				//log.info("starting upload for "+localfilelocation+" to "+remoteFile);
+				log.info("starting upload for "+localfilelocation+" to "+remoteFile);
 				JSch ssh = new JSch();
 						
 				session = ssh.getSession(SftpUploadHelper.ftpusername, SftpUploadHelper.ftpdomain, SftpUploadHelper.ftpport);
-				session.setConfig("StrictHostKeyChecking", "no"); //auto accept secure host
+				session.setConfig("StrictHostKeyChecking", "no"); 
 				session.setPassword(SftpUploadHelper.ftppassword);
 				session.connect();
 				//log.info("Connected to session");
@@ -189,7 +187,7 @@ public class SftpUploader implements Runnable {
 					}
 						sftp.put(new FileInputStream(localfilelocation), remoteFile, null, ChannelSftp.OVERWRITE);
 						
-						//log.info("File successfully uploaded FROM: " + localfilelocation + " TO: " + remoteFile);
+						log.info("File successfully uploaded FROM: " + localfilelocation + " TO: " + remoteFile);
 				}else{
 						
 					try {
@@ -210,14 +208,12 @@ public class SftpUploader implements Runnable {
 			} catch (JSchException e) {
 				
 				//log.info("JSchException " + e.printStackTrace());
-				//log.info("There was an error("+e.getMessage()+") during the upload of ${localfilelocation}. Retrying upload...");
-			
-					this.uploadFile(localfilelocation, remotefilelocation,(this.retry+1));
+				log.info("There was an error("+e.getMessage()+") during the upload of:\n${localfilelocation}\nRetrying upload...");
+				this.uploadFile(localfilelocation, remotefilelocation,(this.retry+1));
 				
 			} catch (SftpException e) {
 				//log.info("SftpException " + e.printStackTrace());
-				//log.info("There was an error("+e.getMessage()+") during the upload of ${localfilelocation}. Retrying upload...");
-
+					log.info("There was an error("+e.getMessage()+") during the upload of:\n${localfilelocation}\nRetrying upload...");
 					this.uploadFile(localfilelocation, remotefilelocation,(this.retry+1));
 				
 
